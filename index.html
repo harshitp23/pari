@@ -411,7 +411,7 @@
         setTimeout(() => { noBtn.style.transform = ''; }, 160);
       } else if(noAttempts < CONVERT_AT){
         hint.classList.add('show');
-        hint.textContent = 'are you sure? 😌';
+        hint.textContent = 'i see how it is';
       } else {
         // Convert No -> Yes
         noBtn.dataset.converted = 'true';
@@ -419,7 +419,7 @@
         noBtn.classList.add('btn-yes');
         noBtn.textContent = 'Yes';
         hint.classList.add('show');
-        hint.textContent = 'better 🙂';
+        hint.textContent = 'better 🙄';
       }
     });
 
