@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pari 💌</title>
+  <meta name="description" content="A tiny question for Pari." />
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#1a1030;
+      --card: rgba(255,255,255,0.08);
+      --card2: rgba(255,255,255,0.12);
+      --text: rgba(255,255,255,0.92);
+      --muted: rgba(255,255,255,0.72);
+      --stroke: rgba(255,255,255,0.14);
+      --shadow: 0 18px 60px rgba(0,0,0,0.45);
+      --radius: 20px;
+      --yes1:#ff4d6d;
+      --yes2:#ff7a59;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      overflow-x:hidden;
+      background: radial-gradient(1100px 700px at 20% 20%, rgba(255,77,109,0.20), transparent 55%),
+                  radial-gradient(900px 600px at 80% 30%, rgba(255,122,89,0.18), transparent 60%),
+                  radial-gradient(900px 700px at 50% 90%, rgba(178,107,255,0.16), transparent 55%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+    }
+
+    /* Floating hearts background */
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      overflow:hidden;
+      z-index:0;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,0.25));
+    }
+    .heart{
+      position:absolute;
+      bottom:-80px;
+      width:18px;
+      height:18px;
+      transform: rotate(45deg);
+      opacity:0.0;
+      animation: floatUp linear infinite;
+    }
+    .heart::before,
+    .heart::after{
+      content:"";
+      position:absolute;
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.65), rgba(255,77,109,0.85));
+    }
+    .heart::before{ left:-9px; top:0; }
+    .heart::after{ left:0; top:-9px; }
+    .heart{ background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.55), rgba(255,122,89,0.85)); }
+
+    @keyframes floatUp{
+      0%   { transform: translateY(0) translateX(0) rotate(45deg) scale(0.9); opacity:0; }
+      10%  { opacity:0.55; }
+      90%  { opacity:0.55; }
+      100% { transform: translateY(-120vh) translateX(var(--drift)) rotate(45deg) scale(1.2); opacity:0; }
+    }
+
+    .wrap{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 28px 14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .card{
+      width:min(540px, 100%);
+      background: linear-gradient(180deg, var(--card), rgba(255,255,255,0.05));
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px 22px;
+      backdrop-filter: blur(10px);
+    }
+
+    .title{
+      text-align:center;
+      margin:0 0 10px 0;
+      font-size: clamp(28px, 4.5vw, 38px);
+      letter-spacing: 0.4px;
+    }
+    .subtitle{
+      text-align:center;
+      margin: 0 0 18px 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height:1.5;
+    }
+    .question{
+      text-align:center;
+      margin: 12px 0 22px 0;
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: 700;
+    }
+
+    .row{
+      display:flex;
+      gap: 12px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+
+    button{
+      appearance:none;
+      border:1px solid transparent;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 650;
+      cursor:pointer;
+      transition: transform .12s ease, filter .12s ease, background .2s ease, border-color .2s ease;
+      min-width: 132px;
+      font-size: 15px;
+    }
+    button:active{ transform: translateY(1px) scale(0.99); }
+    .btn-yes{
+      background: linear-gradient(135deg, var(--yes1), var(--yes2));
+      color: white;
+      box-shadow: 0 10px 22px rgba(255,77,109,0.25);
+    }
+    .btn-yes:hover{ filter: brightness(1.03); transform: translateY(-1px); }
+    .btn-no{
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.16);
+      color: rgba(255,255,255,0.86);
+    }
+    .btn-no:hover{ background: rgba(255,255,255,0.09); transform: translateY(-1px); }
+
+    .hint{
+      height: 18px;
+      margin-top: 14px;
+      text-align:center;
+      font-size: 13px;
+      color: rgba(255,255,255,0.70);
+      opacity:0;
+      transition: opacity .2s ease;
+      user-select:none;
+    }
+    .hint.show{ opacity:1; }
+
+    /* Views */
+    .view{
+      display:none;
+      animation: fadeIn .28s ease both;
+    }
+    .view.active{ display:block; }
+    @keyframes fadeIn{
+      from{ opacity:0; transform: translateY(6px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+
+    /* Envelope */
+    .envelope-wrap{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 14px;
+      padding: 8px 6px 2px;
+    }
+    .envelope{
+      width: min(360px, 92%);
+      aspect-ratio: 16 / 11;
+      position:relative;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.35);
+      overflow:hidden;
+    }
+    .env-body{
+      position:absolute; inset:0;
+      background: radial-gradient(600px 260px at 30% 10%, rgba(255,77,109,0.14), transparent 55%),
+                  radial-gradient(520px 240px at 80% 30%, rgba(255,122,89,0.12), transparent 55%),
+                  linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+    }
+    .env-flap{
+      position:absolute;
+      left:0; right:0; top:0;
+      height:58%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.04));
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: 50% 0%;
+      transform: rotateX(0deg);
+      transition: transform .55s cubic-bezier(.2,.9,.2,1);
+      border-bottom: 1px solid rgba(255,255,255,0.10);
+    }
+    .seal{
+      position:absolute;
+      left:50%; top:52%;
+      transform: translate(-50%,-50%);
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.65), rgba(255,77,109,0.9));
+      box-shadow: 0 10px 22px rgba(255,77,109,0.25);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 18px;
+      border: 1px solid rgba(255,255,255,0.18);
+      user-select:none;
+    }
+
+    .letter{
+      width: min(560px, 100%);
+      margin-top: 6px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
+      border:1px solid rgba(255,255,255,0.16);
+      border-radius: 18px;
+      padding: 18px 16px;
+      box-shadow: 0 16px 45px rgba(0,0,0,0.28);
+      display:none;
+      animation: popIn .28s ease both;
+    }
+    @keyframes popIn{
+      from{ opacity:0; transform: translateY(10px) scale(0.99); }
+      to{ opacity:1; transform: translateY(0) scale(1); }
+    }
+    .letter h2{
+      margin:0 0 10px 0;
+      font-size: 20px;
+      letter-spacing: 0.2px;
+      text-align:left;
+    }
+    .letter p{
+      margin: 0 0 10px 0;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.86);
+      white-space: pre-wrap;
+    }
+    .sig{
+      margin-top: 12px;
+      color: rgba(255,255,255,0.78);
+      font-weight: 650;
+    }
+
+    .small{
+      font-size: 12px;
+      color: rgba(255,255,255,0.60);
+      text-align:center;
+      margin-top: 10px;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .heart{ animation: none; opacity:0.25; }
+      .view{ animation:none; }
+      .env-flap{ transition:none; }
+      button{ transition:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="hearts" aria-hidden="true" id="hearts"></div>
+
+  <main class="wrap">
+    <section class="card">
+
+      <!-- VIEW 1: Question -->
+      <div class="view active" id="view-question">
+        <h1 class="title">Pari</h1>
+        <p class="subtitle">I’ve got a question for you.</p>
+        <div class="question">Will you be my Valentine?</div>
+
+        <div class="row">
+          <button class="btn-yes" id="yesBtn" type="button">Yes</button>
+          <button class="btn-no" id="noBtn" type="button">No</button>
+        </div>
+
+        <div class="hint" id="hint">hmm 👀</div>
+      </div>
+
+      <!-- VIEW 2: Letter -->
+      <div class="view" id="view-letter">
+        <h1 class="title">💌</h1>
+        <p class="subtitle">You’ve got mail.</p>
+
+        <div class="envelope-wrap">
+          <div class="envelope" id="envelope" role="img" aria-label="An envelope you can open">
+            <div class="env-body"></div>
+            <div class="env-flap" id="flap"></div>
+            <div class="seal">❤</div>
+          </div>
+
+          <button class="btn-yes" id="openBtn" type="button">Open</button>
+
+          <div class="letter" id="letter">
+            <h2>Dear Pari,</h2>
+
+            <!-- EDIT YOUR LETTER TEXT BELOW (inside this <p>) -->
+            <p id="letterText">
+            </p>
+            <!-- EDIT YOUR LETTER TEXT ABOVE -->
+
+            <div class="sig">— Harsh</div>
+          </div>
+
+          <div class="small">Tap “Open” to read.</div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <script>
+    // ===== Hearts background generator (lightweight) =====
+    (function makeHearts(){
+      const container = document.getElementById('hearts');
+      const HEARTS = 18; // keep light
+
+      function rand(min, max){ return Math.random() * (max - min) + min; }
+
+      for(let i=0;i<HEARTS;i++){
+        const h = document.createElement('div');
+        h.className = 'heart';
+        const left = rand(0, 100);
+        const size = rand(10, 22);
+        const dur  = rand(10, 18);
+        const delay= rand(0, 8);
+        const drift= rand(-40, 40) + 'px';
+
+        h.style.left = left + 'vw';
+        h.style.width = size + 'px';
+        h.style.height = size + 'px';
+        h.style.animationDuration = dur + 's';
+        h.style.animationDelay = delay + 's';
+        h.style.setProperty('--drift', drift);
+        h.style.opacity = 0; // will fade in via keyframes
+
+        // slight color variance
+        const hueShift = rand(-10, 10);
+        h.style.filter = `hue-rotate(${hueShift}deg)`;
+
+        container.appendChild(h);
+      }
+    })();
+
+    // ===== Page behavior =====
+    const viewQuestion = document.getElementById('view-question');
+    const viewLetter   = document.getElementById('view-letter');
+
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn  = document.getElementById('noBtn');
+    const hint   = document.getElementById('hint');
+
+    const openBtn = document.getElementById('openBtn');
+    const flap    = document.getElementById('flap');
+    const letter  = document.getElementById('letter');
+
+    let noAttempts = 0;
+    const DODGE_ATTEMPTS = 2; // first attempts dodge
+    const CONVERT_AT = 4;     // after this, No becomes Yes
+
+    function showView(which){
+      if(which === 'letter'){
+        viewQuestion.classList.remove('active');
+        viewLetter.classList.add('active');
+      } else {
+        viewLetter.classList.remove('active');
+        viewQuestion.classList.add('active');
+      }
+      // reset hint
+      hint.classList.remove('show');
+      hint.textContent = 'hmm 👀';
+    }
+
+    function goToLetter(){
+      showView('letter');
+      // reset envelope state in case of back/refresh
+      flap.style.transform = 'rotateX(0deg)';
+      letter.style.display = 'none';
+    }
+
+    yesBtn.addEventListener('click', goToLetter);
+
+    // playful No button: dodge -> then convert to Yes
+    noBtn.addEventListener('click', () => {
+      noAttempts++;
+
+      // If already converted, treat as Yes
+      if(noBtn.dataset.converted === 'true'){
+        goToLetter();
+        return;
+      }
+
+      if(noAttempts <= DODGE_ATTEMPTS){
+        hint.classList.add('show');
+
+        // small dodge movement
+        const dx = (Math.random() > 0.5 ? 1 : -1) * (18 + Math.random() * 18);
+        const dy = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 10);
+        noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
+        setTimeout(() => { noBtn.style.transform = ''; }, 160);
+      } else if(noAttempts < CONVERT_AT){
+        hint.classList.add('show');
+        hint.textContent = 'are you sure? 😌';
+      } else {
+        // Convert No -> Yes
+        noBtn.dataset.converted = 'true';
+        noBtn.classList.remove('btn-no');
+        noBtn.classList.add('btn-yes');
+        noBtn.textContent = 'Yes';
+        hint.classList.add('show');
+        hint.textContent = 'better 🙂';
+      }
+    });
+
+    // envelope open
+    openBtn.addEventListener('click', () => {
+      flap.style.transform = 'rotateX(180deg)';
+      setTimeout(() => {
+        letter.style.display = 'block';
+        // if user left letter blank, show a subtle placeholder
+        const lt = document.getElementById('letterText');
+        if(lt && lt.textContent.trim().length === 0){
+          lt.textContent = "(Write your letter here.)";
+          lt.style.color = "rgba(255,255,255,0.65)";
+        }
+      }, 260);
+    });
+
+    // allow clicking the envelope itself to open
+    document.getElementById('envelope').addEventListener('click', () => openBtn.click());
+  </script>
+</body>
+</html>
