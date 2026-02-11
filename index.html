@@ -10,7 +10,6 @@
       --bg1:#0b1020;
       --bg2:#1a1030;
       --card: rgba(255,255,255,0.08);
-      --card2: rgba(255,255,255,0.12);
       --text: rgba(255,255,255,0.92);
       --muted: rgba(255,255,255,0.72);
       --stroke: rgba(255,255,255,0.14);
@@ -94,7 +93,7 @@
     .title{
       text-align:center;
       margin:0 0 10px 0;
-      font-size: clamp(28px, 4.5vw, 38px);
+      font-size: clamp(26px, 4.5vw, 38px);
       letter-spacing: 0.4px;
     }
     .subtitle{
@@ -107,7 +106,7 @@
     .question{
       text-align:center;
       margin: 12px 0 22px 0;
-      font-size: clamp(22px, 4vw, 30px);
+      font-size: clamp(20px, 4vw, 30px);
       font-weight: 700;
     }
 
@@ -167,7 +166,7 @@
       to{ opacity:1; transform: translateY(0); }
     }
 
-    /* Envelope */
+    /* Envelope + Letter */
     .envelope-wrap{
       display:flex;
       flex-direction:column;
@@ -176,11 +175,12 @@
       padding: 8px 6px 2px;
     }
 
-    /* NEW: Stage keeps the letter in the SAME area as the envelope */
+    /* Stage: starts as envelope-sized */
     .mail-stage{
       width: min(360px, 92%);
       aspect-ratio: 16 / 11;
       position: relative;
+      transition: height .25s ease;
     }
 
     .envelope{
@@ -211,49 +211,27 @@
       transition: transform .55s cubic-bezier(.2,.9,.2,1);
       border-bottom: 1px solid rgba(255,255,255,0.10);
     }
-    .seal{
-      position:absolute;
-      left:50%; top:52%;
-      transform: translate(-50%,-50%);
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.65), rgba(255,77,109,0.9));
-      box-shadow: 0 10px 22px rgba(255,77,109,0.25);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 18px;
-      border: 1px solid rgba(255,255,255,0.18);
-      user-select:none;
-    }
 
+    /* Letter base */
     .letter{
       background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
       border:1px solid rgba(255,255,255,0.16);
       border-radius: 16px;
       padding: 18px 16px;
       box-shadow: 0 16px 45px rgba(0,0,0,0.28);
+    }
 
-      /* NEW: overlay behavior */
-      position: absolute;
-      inset: 10px;
-      width: auto;
-      height: auto;
-      margin: 0;
-      display: none;
-      overflow: auto;
-
-      /* smooth reveal */
-      opacity: 0;
+    /* Before opening: keep letter hidden (we reveal after open) */
+    .letter{
+      display:none;
+      opacity:0;
       transform: translateY(10px);
       transition: opacity .25s ease, transform .25s ease;
     }
-
     .letter.show{
-      display: block;
-      opacity: 1;
+      display:block;
+      opacity:1;
       transform: translateY(0);
-      animation: none; /* prevent bottom pop animation */
     }
 
     .letter h2{
@@ -274,11 +252,29 @@
       font-weight: 650;
     }
 
+    /* When opened:
+       - stop forcing envelope aspect ratio
+       - hide envelope entirely
+       - show letter as normal flow (no inner scroll box) */
+    .mail-stage.opened{
+      aspect-ratio: auto;
+      height: auto;
+    }
+    .mail-stage.opened .envelope{
+      display:none;
+    }
+    .mail-stage.opened .letter{
+      position: relative;
+      display:block;
+      opacity:1;
+      transform:none;
+    }
+
     .small{
       font-size: 12px;
       color: rgba(255,255,255,0.60);
       text-align:center;
-      margin-top: 10px;
+      margin-top: 2px;
     }
 
     /* Reduced motion */
@@ -300,8 +296,8 @@
 
       <!-- VIEW 1: Question -->
       <div class="view active" id="view-question">
-        <h1 class="title">For Pari</h1>
-        <div class="question">Will you be my Valentine? 💘</div>
+        <h1 class="title">HI</h1>
+        <div class="question">Will you, Parinishtha Sharma, be my Valentine? 💘</div>
 
         <div class="row">
           <button class="btn-yes" id="yesBtn" type="button">Yes</button>
@@ -314,26 +310,22 @@
       <!-- VIEW 2: Letter -->
       <div class="view" id="view-letter">
         <h1 class="title">💌</h1>
-        <p class="subtitle">I hope you like it <3</p>
+        <p class="subtitle">I hope you like it &lt;3</p>
 
         <div class="envelope-wrap">
-
-          <!-- NEW: mail-stage wraps envelope + letter so letter opens ON TOP -->
           <div class="mail-stage" id="mailStage">
             <div class="envelope" id="envelope" role="img" aria-label="An envelope you can open">
               <div class="env-body"></div>
               <div class="env-flap" id="flap"></div>
-              <div class="seal">❤</div>
+              <!-- Seal removed -->
             </div>
 
             <div class="letter" id="letter">
               <h2>Dear Pari,</h2>
 
-              <!-- EDIT YOUR LETTER TEXT BELOW (inside this <p>) -->
               <p id="letterText">
-                I am so glad to have you in my life, and we have been together for so long, its gonna be 1 and a half years, thats so long hehe, I wish I was there for valentines day and your birthday ofc hehe, YOURE TURNING 20, I know you'll have a great time on your birthday and I have other special surprises for you 😘. Im really glad you said yes for being my valentine (you have no choice 😁). I will plan out what we do on that day, coz its a saturday and we will be free hehe, or if not we can do it on sunday <3. I hope you like this website my cutu, I love you so much and I miss you I can't wait to see you again my cutie pie, mwah. 
+I am so glad to have you in my life, and we have been together for so long, its gonna be 1 and a half years, thats so long hehe, I wish I was there for valentines day and your birthday ofc hehe, YOURE TURNING 20, I know you'll have a great time on your birthday and I have other special surprises for you 😘. Im really glad you said yes for being my valentine (you have no choice 😁). I will plan out what we do on that day, coz its a saturday and we will be free hehe, or if not we can do it on sunday &lt;3. I hope you like this website my cutu, I love you so much and I miss you I can't wait to see you again my cutie pie, mwah.
               </p>
-              <!-- EDIT YOUR LETTER TEXT ABOVE -->
 
               <div class="sig">— Love, Harshit</div>
             </div>
@@ -351,7 +343,7 @@
     // ===== Hearts background generator (lightweight) =====
     (function makeHearts(){
       const container = document.getElementById('hearts');
-      const HEARTS = 18; // keep light
+      const HEARTS = 18;
 
       function rand(min, max){ return Math.random() * (max - min) + min; }
 
@@ -370,9 +362,7 @@
         h.style.animationDuration = dur + 's';
         h.style.animationDelay = delay + 's';
         h.style.setProperty('--drift', drift);
-        h.style.opacity = 0; // will fade in via keyframes
 
-        // slight color variance
         const hueShift = rand(-10, 10);
         h.style.filter = `hue-rotate(${hueShift}deg)`;
 
@@ -388,13 +378,14 @@
     const noBtn  = document.getElementById('noBtn');
     const hint   = document.getElementById('hint');
 
-    const openBtn = document.getElementById('openBtn');
-    const flap    = document.getElementById('flap');
-    const letter  = document.getElementById('letter');
+    const openBtn   = document.getElementById('openBtn');
+    const flap      = document.getElementById('flap');
+    const letter    = document.getElementById('letter');
+    const mailStage = document.getElementById('mailStage');
 
     let noAttempts = 0;
-    const DODGE_ATTEMPTS = 2; // first attempts dodge
-    const CONVERT_AT = 4;     // after this, No becomes Yes
+    const DODGE_ATTEMPTS = 2;
+    const CONVERT_AT = 4;
 
     function showView(which){
       if(which === 'letter'){
@@ -404,16 +395,15 @@
         viewLetter.classList.remove('active');
         viewQuestion.classList.add('active');
       }
-      // reset hint
       hint.classList.remove('show');
       hint.textContent = 'hmm 👀';
     }
 
     function goToLetter(){
       showView('letter');
-      // reset envelope state in case of back/refresh
       flap.style.transform = 'rotateX(0deg)';
-      letter.classList.remove('show'); // NEW: hide overlay letter
+      letter.classList.remove('show');
+      mailStage.classList.remove('opened');
     }
 
     yesBtn.addEventListener('click', goToLetter);
@@ -422,7 +412,6 @@
     noBtn.addEventListener('click', () => {
       noAttempts++;
 
-      // If already converted, treat as Yes
       if(noBtn.dataset.converted === 'true'){
         goToLetter();
         return;
@@ -431,7 +420,6 @@
       if(noAttempts <= DODGE_ATTEMPTS){
         hint.classList.add('show');
 
-        // small dodge movement
         const dx = (Math.random() > 0.5 ? 1 : -1) * (18 + Math.random() * 18);
         const dy = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 10);
         noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
@@ -440,7 +428,6 @@
         hint.classList.add('show');
         hint.textContent = 'i see how it is';
       } else {
-        // Convert No -> Yes
         noBtn.dataset.converted = 'true';
         noBtn.classList.remove('btn-no');
         noBtn.classList.add('btn-yes');
@@ -450,13 +437,14 @@
       }
     });
 
-    // envelope open (NOW opens letter ON TOP of envelope)
+    // Open: hide envelope, show letter at natural height
     openBtn.addEventListener('click', () => {
       flap.style.transform = 'rotateX(180deg)';
+
       setTimeout(() => {
+        mailStage.classList.add('opened');
         letter.classList.add('show');
 
-        // if user left letter blank, show a subtle placeholder
         const lt = document.getElementById('letterText');
         if(lt && lt.textContent.trim().length === 0){
           lt.textContent = "(Write your letter here.)";
@@ -465,7 +453,7 @@
       }, 260);
     });
 
-    // allow clicking the envelope itself to open
+    // Click envelope to open too
     document.getElementById('envelope').addEventListener('click', () => openBtn.click());
   </script>
 </body>
