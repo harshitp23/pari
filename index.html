@@ -175,7 +175,6 @@
       padding: 8px 6px 2px;
     }
 
-    /* Stage: starts as envelope-sized */
     .mail-stage{
       width: min(360px, 92%);
       aspect-ratio: 16 / 11;
@@ -192,6 +191,7 @@
       border: 1px solid rgba(255,255,255,0.16);
       box-shadow: 0 18px 50px rgba(0,0,0,0.35);
       overflow:hidden;
+      cursor: pointer;
     }
 
     .env-body{
@@ -212,17 +212,12 @@
       border-bottom: 1px solid rgba(255,255,255,0.10);
     }
 
-    /* Letter base */
     .letter{
       background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.06));
       border:1px solid rgba(255,255,255,0.16);
       border-radius: 16px;
       padding: 18px 16px;
       box-shadow: 0 16px 45px rgba(0,0,0,0.28);
-    }
-
-    /* Before opening: keep letter hidden (we reveal after open) */
-    .letter{
       display:none;
       opacity:0;
       transform: translateY(10px);
@@ -252,22 +247,12 @@
       font-weight: 650;
     }
 
-    /* When opened:
-       - stop forcing envelope aspect ratio
-       - hide envelope entirely
-       - show letter as normal flow (no inner scroll box) */
     .mail-stage.opened{
       aspect-ratio: auto;
       height: auto;
     }
     .mail-stage.opened .envelope{
       display:none;
-    }
-    .mail-stage.opened .letter{
-      position: relative;
-      display:block;
-      opacity:1;
-      transform:none;
     }
 
     .small{
@@ -277,14 +262,15 @@
       margin-top: 2px;
     }
 
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      .heart{ animation: none; opacity:0.25; }
-      .view{ animation:none; }
-      .env-flap{ transition:none; }
-      .letter{ transition:none; transform:none; opacity:1; }
-      button{ transition:none; }
+    /* Animation for the memory button appearing */
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
+    .btn-memories {
+      animation: popIn 0.5s ease forwards;
+    }
+
   </style>
 </head>
 
@@ -294,7 +280,6 @@
   <main class="wrap">
     <section class="card">
 
-      <!-- VIEW 1: Question -->
       <div class="view active" id="view-question">
         <h1 class="title">HI</h1>
         <div class="question">Will you, Parinishtha Sharma, be my Valentine? 💘</div>
@@ -307,32 +292,26 @@
         <div class="hint" id="hint">ok ig</div>
       </div>
 
-      <!-- VIEW 2: Letter -->
       <div class="view" id="view-letter">
         <h1 class="title">💌</h1>
         <p class="subtitle">I hope you like it &lt;3</p>
 
-        <div class="envelope-wrap">
+        <div class="envelope-wrap" id="envelopeWrap">
           <div class="mail-stage" id="mailStage">
             <div class="envelope" id="envelope" role="img" aria-label="An envelope you can open">
               <div class="env-body"></div>
               <div class="env-flap" id="flap"></div>
-              <!-- Seal removed -->
             </div>
 
             <div class="letter" id="letter">
               <h2>Dear Pari,</h2>
-
-              <p id="letterText">
-I am so glad to have you in my life, and we have been together for so long, its gonna be 1 and a half years, thats so long hehe, I wish I was there for valentines day and your birthday ofc hehe, YOURE TURNING 20, I know you'll have a great time on your birthday and I have other special surprises for you 😘. Im really glad you said yes for being my valentine (you have no choice 😁). I will plan out what we do on that day, coz its a saturday and we will be free hehe, or if not we can do it on sunday &lt;3. I hope you like this website my cutu, I love you so much and I miss you I can't wait to see you again my cutie pie, mwah.
-              </p>
-
+              <p id="letterText">I am so glad to have you in my life, and we have been together for so long, its gonna be 1 and a half years, thats so long hehe, I wish I was there for valentines day and your birthday ofc hehe, YOURE TURNING 20, I know you'll have a great time on your birthday and I have other special surprises for you 😘. Im really glad you said yes for being my valentine (you have no choice 😁). I will plan out what we do on that day, coz its a saturday and we will be free hehe, or if not we can do it on sunday &lt;3. I hope you like this website my cutu, I love you so much and I miss you I can't wait to see you again my cutie pie, mwah.</p>
               <div class="sig">— Love, Harshit</div>
             </div>
           </div>
 
           <button class="btn-yes" id="openBtn" type="button">Open</button>
-          <div class="small">Tap “Open” to read.</div>
+          <div class="small" id="openHint">Tap “Open” to read.</div>
         </div>
       </div>
 
@@ -340,121 +319,93 @@ I am so glad to have you in my life, and we have been together for so long, its 
   </main>
 
   <script>
-    // ===== Hearts background generator (lightweight) =====
+    // Hearts Generator
     (function makeHearts(){
       const container = document.getElementById('hearts');
       const HEARTS = 18;
-
       function rand(min, max){ return Math.random() * (max - min) + min; }
-
       for(let i=0;i<HEARTS;i++){
         const h = document.createElement('div');
         h.className = 'heart';
-        const left = rand(0, 100);
+        h.style.left = rand(0, 100) + 'vw';
         const size = rand(10, 22);
-        const dur  = rand(10, 18);
-        const delay= rand(0, 8);
-        const drift= rand(-40, 40) + 'px';
-
-        h.style.left = left + 'vw';
-        h.style.width = size + 'px';
-        h.style.height = size + 'px';
-        h.style.animationDuration = dur + 's';
-        h.style.animationDelay = delay + 's';
-        h.style.setProperty('--drift', drift);
-
-        const hueShift = rand(-10, 10);
-        h.style.filter = `hue-rotate(${hueShift}deg)`;
-
+        h.style.width = h.style.height = size + 'px';
+        h.style.animationDuration = rand(10, 18) + 's';
+        h.style.animationDelay = rand(0, 8) + 's';
+        h.style.setProperty('--drift', rand(-40, 40) + 'px');
+        h.style.filter = `hue-rotate(${rand(-10, 10)}deg)`;
         container.appendChild(h);
       }
     })();
 
-    // ===== Page behavior =====
+    // Navigation and Interaction
     const viewQuestion = document.getElementById('view-question');
     const viewLetter   = document.getElementById('view-letter');
-
     const yesBtn = document.getElementById('yesBtn');
     const noBtn  = document.getElementById('noBtn');
     const hint   = document.getElementById('hint');
-
     const openBtn   = document.getElementById('openBtn');
     const flap      = document.getElementById('flap');
     const letter    = document.getElementById('letter');
     const mailStage = document.getElementById('mailStage');
+    const envelopeWrap = document.getElementById('envelopeWrap');
+    const openHint  = document.getElementById('openHint');
 
     let noAttempts = 0;
-    const DODGE_ATTEMPTS = 2;
-    const CONVERT_AT = 4;
-
-    function showView(which){
-      if(which === 'letter'){
-        viewQuestion.classList.remove('active');
-        viewLetter.classList.add('active');
-      } else {
-        viewLetter.classList.remove('active');
-        viewQuestion.classList.add('active');
-      }
-      hint.classList.remove('show');
-      hint.textContent = 'hmm 👀';
-    }
 
     function goToLetter(){
-      showView('letter');
-      flap.style.transform = 'rotateX(0deg)';
-      letter.classList.remove('show');
-      mailStage.classList.remove('opened');
+      viewQuestion.classList.remove('active');
+      viewLetter.classList.add('active');
     }
 
     yesBtn.addEventListener('click', goToLetter);
 
-    // playful No button: dodge -> then convert to Yes
     noBtn.addEventListener('click', () => {
       noAttempts++;
-
-      if(noBtn.dataset.converted === 'true'){
-        goToLetter();
-        return;
-      }
-
-      if(noAttempts <= DODGE_ATTEMPTS){
+      if(noBtn.dataset.converted === 'true') { goToLetter(); return; }
+      if(noAttempts <= 2){
         hint.classList.add('show');
-
-        const dx = (Math.random() > 0.5 ? 1 : -1) * (18 + Math.random() * 18);
-        const dy = (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 10);
+        const dx = (Math.random() > 0.5 ? 1 : -1) * 25;
+        const dy = (Math.random() > 0.5 ? 1 : -1) * 15;
         noBtn.style.transform = `translate(${dx}px, ${dy}px)`;
-        setTimeout(() => { noBtn.style.transform = ''; }, 160);
-      } else if(noAttempts < CONVERT_AT){
-        hint.classList.add('show');
+        setTimeout(() => noBtn.style.transform = '', 160);
+      } else if (noAttempts < 4) {
         hint.textContent = 'i see how it is';
       } else {
         noBtn.dataset.converted = 'true';
-        noBtn.classList.remove('btn-no');
-        noBtn.classList.add('btn-yes');
+        noBtn.classList.replace('btn-no', 'btn-yes');
         noBtn.textContent = 'Yes';
-        hint.classList.add('show');
         hint.textContent = 'better 🙄';
       }
     });
 
-    // Open: hide envelope, show letter at natural height
     openBtn.addEventListener('click', () => {
       flap.style.transform = 'rotateX(180deg)';
-
+      
       setTimeout(() => {
         mailStage.classList.add('opened');
         letter.classList.add('show');
+        
+        // Remove "Open" button and hint
+        openBtn.style.display = 'none';
+        openHint.style.display = 'none';
 
-        const lt = document.getElementById('letterText');
-        if(lt && lt.textContent.trim().length === 0){
-          lt.textContent = "(Write your letter here.)";
-          lt.style.color = "rgba(255,255,255,0.65)";
-        }
-      }, 260);
+        // Add the "Next" button
+        const memBtn = document.createElement('button');
+        memBtn.className = 'btn-yes btn-memories';
+        memBtn.textContent = 'See Our Memories 🌹';
+        memBtn.style.marginTop = '20px';
+        memBtn.style.width = '100%';
+        memBtn.onclick = () => {
+          window.location.href = 'surprise.html';
+        };
+        envelopeWrap.appendChild(memBtn);
+      }, 300);
     });
 
-    // Click envelope to open too
-    document.getElementById('envelope').addEventListener('click', () => openBtn.click());
+    document.getElementById('envelope').addEventListener('click', () => {
+      if(!mailStage.classList.contains('opened')) openBtn.click();
+    });
   </script>
 </body>
 </html>
