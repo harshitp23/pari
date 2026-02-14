@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our 1.5 Years 🌹</title>
+    <style>
+        :root {
+            --bg: #0b1020;
+            --accent: #ff4d6d;
+            --text: #ffffff;
+            --glass: rgba(255, 255, 255, 0.08);
+            --stroke: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #0b1020, #1a1030);
+            color: var(--text);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Fixed Rose Counter */
+        .bouquet-hud {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass);
+            padding: 12px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--stroke);
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+
+        /* Timeline Path */
+        .timeline {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            width: 2px;
+            height: 98%;
+            background: linear-gradient(to bottom, transparent, var(--accent), var(--accent), transparent);
+            transform: translateX(-50%);
+            opacity: 0.3;
+        }
+
+        .memory-node {
+            position: relative;
+            width: 100%;
+            margin-bottom: 120px;
+            display: flex;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.9s cubic-bezier(0.17, 0.55, 0.55, 1);
+        }
+
+        .memory-node.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .content-box {
+            width: 80%;
+            max-width: 500px;
+            background: var(--glass);
+            padding: 20px;
+            border-radius: 24px;
+            border: 1px solid var(--stroke);
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .content-box img {
+            width: 100%;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+
+        .content-box p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.85);
+            margin: 0;
+        }
+
+        /* The Jar Section */
+        .final-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: radial-gradient(circle at center, rgba(255,77,109,0.1), transparent);
+        }
+
+        .jar-wrapper {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.4s ease;
+        }
+
+        .jar-wrapper:hover { transform: scale(1.1) rotate(2deg); }
+        
+        #final-surprise {
+            display: none;
+            max-width: 600px;
+            text-align: center;
+            margin-top: 30px;
+            animation: fadeIn 1.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .heart-fly {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1001;
+            animation: fly linear forwards;
+        }
+
+        @keyframes fly {
+            to { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bouquet-hud">
+        <span id="counter">0</span> / 32 🌹 Collected
+    </div>
+
+    <div class="timeline">
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="1.jpg" alt="Snapchat">
+                <p>The very first beginning: When we added each other on Snapchat. Little did we know...</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="2.jpg" alt="Car">
+                <p>That moment in the car... the first time we felt that close physically. I'll never forget it.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="3.jpg" alt="Stree 2">
+                <p>Watching Stree 2 together. Our first movie date was the start of so many more.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="4.jpg" alt="Goodbye">
+                <p>The hardest goodbye: Me leaving for the US. My heart stayed back with you.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="5.jpg" alt="Long Distance">
+                <p>Laptop dates and endless calls. Long distance is hard, but you make it worth it.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="6.jpg" alt="December Hug">
+                <p>The December Hug. Coming back to you after a whole semester was the best feeling ever.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="7.jpg" alt="New Years">
+                <p>Starting the year right: Celebrating New Year's Eve by your side.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="8.jpg" alt="Movie Date">
+                <p>Back at the cinema! We really do love our movie dates, don't we?</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="9.jpg" alt="Jerseys">
+                <p>Mirror selfie in each other's jerseys. You look better in mine than I do!</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="10.jpg" alt="Birthday">
+                <p>Celebrating your special day. You were absolutely glowing.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="11.jpg" alt="Lift Mirror">
+                <p>Summer vibes and lift mirror selfies. Classic us.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="12.jpg" alt="Summer Movie">
+                <p>Another summer movie date. I could watch anything as long as I'm with you.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="13.jpg" alt="Mall">
+                <p>Walking through the mall, just enjoying being in your presence.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="14.jpg" alt="Sobha">
+                <p>Relaxing at the Sobha clubhouse. Such a peaceful memory.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="15.jpg" alt="Lift 2">
+                <p>Another lift mirror selfie because we just can't help ourselves.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="16.jpg" alt="Car selfie">
+                <p>Road trips and car rides—every journey is better with you.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="17.jpg" alt="Saanvi Bday">
+                <p>Saanvi's birthday! Loved celebrating together.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="18.jpg" alt="Random Date">
+                <p>Just a random date, but those are often my favorite ones.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="19.jpg" alt="Pondi">
+                <p>Our Pondi trip! Such an amazing escape and so many laughs.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="20.jpg" alt="Work Kurta">
+                <p>You in your kurta for work—you looked so beautiful and professional.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="21.jpg" alt="Shopping">
+                <p>Shopping together! Even the most boring chores are fun with you.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="22.jpg" alt="Saanvi Plot">
+                <p>Hanging out at Saanvi's plot. Just us being us.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="23.jpg" alt="Zoe">
+                <p>You and Zoe—my two favorites in one frame.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="24.jpg" alt="Room Flag">
+                <p>My room in the US—keeping you close with your flag on my wall.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="25.jpg" alt="December 2">
+                <p>Back together again in December. The cycle of love continues.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="26.jpg" alt="Restaurant">
+                <p>Sharing a meal, sharing a life. I love our dinner dates.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="27.jpg" alt="Lying down">
+                <p>Just lying down and talking for hours. The simplest moments are the best.</p>
+            </div>
+        </div>
+
+        <div class="memory-node">
+            <div class="content-box">
+                <img src="28.jpg" alt="Wonderla">
+                <p>The Wonderla trip! So much adrenaline and so much fun.</p>
+            </div>
+        </div>
+
+        </div>
+
+    <section class="final-section">
+        <div class="jar-wrapper" onclick="openJar()">
+            <h2 style="margin-bottom: 20px;">The Jar of 1.5 Years</h2>
+            <div style="font-size: 100px;">🫙</div>
+            <p>Tap to open the final rose</p>
+        </div>
+
+        <div id="final-surprise">
+            <div class="content-box" style="width:100%; margin:0 auto;">
+                <img src="32.jpg" alt="Final Us">
+                <h2>I Love You More Than Ever</h2>
+                <p>Every picture tells a story of why I'm the luckiest guy. Happy Valentine's Day, my cutie pie! 💌</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const nodes = document.querySelectorAll('.memory-node');
+        const counter = document.getElementById('counter');
+        let roses = 0;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('visible')) {
+                    entry.target.classList.add('visible');
+                    roses++;
+                    counter.innerText = roses;
+                    spawnHearts();
+                }
+            });
+        }, { threshold: 0.3 });
+
+        nodes.forEach(node => observer.observe(node));
+
+        function spawnHearts() {
+            for(let i=0; i<5; i++) {
+                const h = document.createElement('div');
+                h.className = 'heart-fly';
+                h.innerHTML = '❤️';
+                h.style.left = Math.random() * 100 + 'vw';
+                h.style.bottom = '-5vh';
+                h.style.fontSize = Math.random() * 20 + 10 + 'px';
+                h.style.animationDuration = Math.random() * 2 + 2 + 's';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 3000);
+            }
+        }
+
+        function openJar() {
+            document.getElementById('final-surprise').style.display = 'block';
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            counter.innerText = "32"; // Final count
+            for(let i=0; i<50; i++) {
+                setTimeout(spawnHearts, i * 100);
+            }
+        }
+    </script>
+</body>
+</html>
